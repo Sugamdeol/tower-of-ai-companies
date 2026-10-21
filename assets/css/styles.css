@@ -15,10 +15,10 @@
   --radius: 14px;
   --shadow: 0 24px 60px rgba(0, 0, 0, 0.55);
   /* Tower geometry lives in app.js (single source of truth); these are fallbacks. */
-  --fw: 430px; /* floor width  */
-  --fh: 46px;  /* floor height */
-  --gap: 3px;  /* gap between floors */
-  --stage-h: 640px;
+  --fw: 900px; /* floor width at the base */
+  --fh: 66px;  /* floor height */
+  --gap: 4px;  /* gap between floors */
+  --stage-h: 620px;
   --ride: 0px;
 }
 
@@ -54,7 +54,7 @@ a { color: var(--accent); }
   align-items: center;
   gap: 18px;
   flex-wrap: wrap;
-  padding: 12px 22px;
+  padding: 7px 22px;
   background: rgba(7, 11, 22, 0.82);
   backdrop-filter: blur(14px);
   border-bottom: 1px solid var(--line);
@@ -149,21 +149,27 @@ button.btn[disabled] { opacity: 0.45; cursor: not-allowed; }
 .pill .dot { width: 7px; height: 7px; border-radius: 50%; background: var(--ok); }
 
 /* ----------------------------------------------------------------- views */
-.view { display: none; padding: 26px 22px 70px; }
+.view { display: none; padding: 8px 22px 18px; }
 .view.active { display: block; }
 
 h1 { font-size: 27px; letter-spacing: -0.02em; margin: 0 0 6px; }
 h2 { font-size: 19px; letter-spacing: -0.01em; margin: 0 0 4px; }
 h3 { font-size: 15px; margin: 0 0 6px; }
-.lede { color: var(--ink-dim); max-width: 68ch; margin: 0 0 22px; }
+.lede {
+  color: var(--ink-dim);
+  max-width: 96ch;
+  margin: 0 0 8px;
+  font-size: 13.5px;
+  line-height: 1.45;
+}
 .muted { color: var(--ink-dim); }
 .faint { color: var(--ink-faint); font-size: 13px; }
 
 /* ------------------------------------------------------------ tower view */
 .tower-layout {
   display: grid;
-  grid-template-columns: minmax(0, 1fr) 340px;
-  gap: 22px;
+  grid-template-columns: minmax(0, 1fr) 320px;
+  gap: 20px;
   align-items: start;
 }
 @media (max-width: 1080px) { .tower-layout { grid-template-columns: 1fr; } }
@@ -204,9 +210,9 @@ h3 { font-size: 15px; margin: 0 0 6px; }
 }
 
 /* ----------------------------------------------------------------- tower
-   A stacked-floors tower: each floor is a slab with a lit facade, a slight
-   rotateX for depth and a per-floor horizontal offset so the stack reads as
-   a building rather than a list. The "elevator" animates the stack's
+   A stacked-floors tower: each floor is a slab with a lit facade, tapering
+   in width as it rises and offset slightly to the side, so the stack reads
+   as a building rather than a list. The "elevator" animates the stack's
    translateY so the chosen floor arrives in the middle of the stage. */
 .tower-viewport {
   position: absolute;
@@ -215,14 +221,12 @@ h3 { font-size: 15px; margin: 0 0 6px; }
   display: flex;
   align-items: center;
   justify-content: center;
-  perspective: 1500px;
-  perspective-origin: 50% 50%;
 }
 
 /* The camera: this element carries the elevator ride and the rotation. */
 .tower-ride {
-  transform: translateY(var(--ride, 0px)) rotateY(var(--spin, 0deg));
-  transform-style: preserve-3d;
+  transform: translateY(var(--ride, 0px)) translateX(var(--centre, 0px))
+             rotateY(var(--spin, 0deg));
   transition: transform 1s cubic-bezier(0.22, 1, 0.36, 1);
   will-change: transform;
 }
@@ -231,7 +235,6 @@ h3 { font-size: 15px; margin: 0 0 6px; }
 .tower-stack {
   position: relative;
   width: var(--fw);
-  transform-style: preserve-3d;
 }
 
 .tower-shaft {
@@ -277,8 +280,8 @@ h3 { font-size: 15px; margin: 0 0 6px; }
 .tower-base {
   position: relative;
   z-index: 1;
-  width: calc(var(--fw) + 74px);
-  height: 34px;
+  width: calc(var(--fw) * 0.84 + 74px);
+  height: 30px;
   margin: 0 auto;
   border-radius: 0 0 8px 8px;
   background: linear-gradient(180deg, rgba(38, 52, 84, 0.98), rgba(14, 20, 36, 0.98));
@@ -296,12 +299,11 @@ h3 { font-size: 15px; margin: 0 0 6px; }
 .floor {
   position: relative;
   z-index: 1;
-  width: var(--fw);
+  width: calc(var(--fw) * var(--taper, 1));
   height: var(--fh);
   margin: 0 auto var(--gap);
-  transform: translateX(var(--x, 0px)) rotateX(9deg) rotateZ(-1.2deg);
-  transform-style: preserve-3d;
-  transition: transform 0.35s cubic-bezier(0.22, 1, 0.36, 1), filter 0.3s, opacity 0.3s;
+  transform: translateX(var(--x, 0px));
+  transition: width 0.35s cubic-bezier(0.22, 1, 0.36, 1), transform 0.35s cubic-bezier(0.22, 1, 0.36, 1), filter 0.3s, opacity 0.3s;
 }
 
 .floor-slab {
@@ -345,20 +347,22 @@ h3 { font-size: 15px; margin: 0 0 6px; }
 .floor-plate {
   position: relative;
   height: 100%;
-  padding: 7px 12px 10px;
+  padding: 6px 14px 20px;
   display: flex;
   flex-direction: column;
-  justify-content: space-between;
+  justify-content: flex-start;
+  gap: 0;
+  overflow: hidden;
 }
 .floor-topline { display: flex; align-items: center; justify-content: space-between; gap: 8px; }
 .floor-num {
-  font-size: 10px;
+  font-size: 10.5px;
   letter-spacing: 0.16em;
   color: var(--ink-faint);
   text-transform: uppercase;
 }
-.floor-name { font-weight: 700; font-size: 14px; letter-spacing: -0.01em; line-height: 1.2; }
-.floor-tagline { font-size: 10.5px; color: var(--ink-dim); margin-top: 1px; }
+.floor-name { font-weight: 700; font-size: 15px; letter-spacing: -0.01em; line-height: 1.15; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.floor-tagline { font-size: 11px; color: var(--ink-dim); line-height: 1.2; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
 .floor-status { display: flex; align-items: center; gap: 6px; font-size: 10.5px; color: var(--ink-dim); }
 .floor-status .dot { width: 7px; height: 7px; border-radius: 50%; flex: none; }
 .dot.busy { background: var(--warn); box-shadow: 0 0 9px var(--warn); }
@@ -368,8 +372,9 @@ h3 { font-size: 15px; margin: 0 0 6px; }
 /* Facade: a strip of windows along the bottom of every floor. */
 .windows {
   position: absolute;
-  left: 10px; right: 10px; bottom: 9px;
-  height: 15px;
+  right: 14px; bottom: 6px;
+  width: 168px;
+  height: 12px;
   display: flex;
   gap: 4px;
   z-index: 2;
@@ -421,11 +426,16 @@ h3 { font-size: 15px; margin: 0 0 6px; }
 
 .floor-tag {
   position: absolute;
-  right: 16px; top: 14px;
-  z-index: 5;
-  font-size: 12px;
-  color: var(--ink-dim);
-  text-align: right;
+  right: 14px; bottom: 4px;
+  z-index: 6;
+  padding: 2px 8px;
+  border-radius: 6px;
+  border: 1px solid var(--line-strong);
+  background: rgba(9, 14, 27, 0.92);
+  font-size: 11px;
+  color: var(--ink);
+  white-space: nowrap;
+  pointer-events: none;
 }
 
 /* --------------------------------------------------------------- elevator */
@@ -722,7 +732,7 @@ table.list tr:last-child td { border-bottom: 0; }
 
 footer.site {
   border-top: 1px solid var(--line);
-  padding: 20px 22px 34px;
+  padding: 8px 22px 10px;
   color: var(--ink-faint);
   font-size: 12.5px;
   display: flex;

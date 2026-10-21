@@ -11,11 +11,15 @@
   // Tower geometry. CSS reads these from custom properties written below so
   // the stylesheet and the script can never disagree.
   const TOWER_FLOORS = 8;
-  const FLOOR_W = 430;
-  const FLOOR_H = 46;
-  const FLOOR_GAP = 3;
+  const FLOOR_W = 900;
+  const FLOOR_H = 66;
+  const FLOOR_GAP = 4;
   const BASE_H = 30;
-  const STAGE_H = 640;
+  const STAGE_H = 620;
+  // Each floor is narrower than the one below it, so the stack reads as a
+  // tower in perspective without any 3D rotation (which would inflate the
+  // slabs and overflow the stage).
+  const FLOOR_TAPER_STEP = 0.032;
   const TOWER_SPIN = -14;
 
   let state = {
@@ -283,7 +287,9 @@
       floorNode.dataset.floor = String(floor);
       floorNode.dataset.companyId = company.id;
       // Slight per-floor horizontal offset so the stack reads as a building.
-      floorNode.style.setProperty("--x", (floor % 2 === 0 ? 9 : -7) + "px");
+      floorNode.style.setProperty("--x", (floor % 2 === 0 ? 8 : -6) + "px");
+      floorNode.style.setProperty(
+        "--taper", String(1 - (floor - 1) * FLOOR_TAPER_STEP));
       floorNode.style.setProperty("--accent-company", company.accent || "#6ea8fe");
 
       const slab = el("div", "floor-slab");
@@ -370,7 +376,13 @@
     });
     const company = companyByFloor(floor);
     const tag = $("#floor-tag");
-    if (tag && company) tag.textContent = "Floor " + floor + " - " + company.name;
+    if (tag && company) {
+      tag.textContent = "Floor " + floor + " - " + company.name;
+      // Move the caption into the selected floor's own card so it always sits
+      // next to the floor it names, whichever floor that is.
+      const selected = $('.floor[data-floor="' + floor + "'] .floor-plate");
+      if (selected && tag.parentNode !== selected) selected.appendChild(tag);
+    }
     if (openOffice && company) openOfficePanel(company.id);
   }
 
