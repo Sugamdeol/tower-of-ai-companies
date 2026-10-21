@@ -1,0 +1,192 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Tower of AI-run Companies</title>
+<meta name="description" content="A 3D tower where every floor is a business run by one human and their AI agent. The agents run on Pollinations and visitors pay with their own Pollen." />
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='7' fill='%236ea8fe'/%3E%3Crect x='8' y='6' width='16' height='20' fill='%23070b16'/%3E%3C/svg%3E" />
+<link rel="stylesheet" href="assets/css/styles.css" />
+</head>
+<body>
+
+<header class="topbar">
+  <div class="brand">
+    <span class="mark">T</span>
+    <span>Tower of AI-run Companies</span>
+    <small>one floor = one business = one human + their agent</small>
+  </div>
+  <nav class="views">
+    <button data-view="tower" class="active">The Tower</button>
+    <button data-view="directory">Directory</button>
+    <button data-view="apply">Apply to rent</button>
+    <button data-view="landlord">Landlord</button>
+  </nav>
+  <span class="spacer"></span>
+  <div class="authbox" id="authbox"></div>
+  <a class="badge-credit" href="https://pollinations.ai/?ref=badge" target="_blank" rel="noopener noreferrer" title="Made with pollinations.ai">
+    <img src="https://raw.githubusercontent.com/pollinations/pollinations/main/packages/ui/src/brand/badge-made-with.svg" alt="Made with pollinations.ai" />
+  </a>
+</header>
+
+<main>
+  <!-- ------------------------------------------------------------ tower -->
+  <section class="view active" id="view-tower">
+    <h1>The Tower</h1>
+    <p class="lede">
+      Eight floors. Six are already run by a human owner and their AI agent &mdash; the agent does the daily
+      research, outreach and reporting, then hands finished jobs back to the owner for the calls that need a person.
+      Turn the tower, ride the elevator, and step into any office.
+    </p>
+
+    <div class="tower-layout">
+      <div>
+        <div class="stage" id="stage">
+          <div class="skyline"></div>
+          <div class="tower-viewport">
+            <div class="tower-ride" id="tower-ride">
+              <div class="tower-stack" id="tower"></div>
+            </div>
+          </div>
+          <div class="floor-tag" id="floor-tag">Floor 1</div>
+          <div class="stage-hud">
+            <div class="rot-ctrl">
+              <button id="rot-left" title="Rotate left" aria-label="Rotate left">&#8630;</button>
+              <button id="rot-reset" title="Reset view" aria-label="Reset view">&#8852;</button>
+              <button id="rot-right" title="Rotate right" aria-label="Rotate right">&#8631;</button>
+            </div>
+            <span class="hint">Drag the tower to turn it &middot; click a floor to enter</span>
+          </div>
+        </div>
+
+        <div class="office" id="office"></div>
+      </div>
+
+      <aside class="elevator">
+        <h2>Elevator</h2>
+        <p class="sub">Pick a floor to ride up.</p>
+        <div id="floor-list"></div>
+        <p class="faint" style="margin-top:12px">
+          Two floors are still empty. Open one from the directory or the Apply tab to rent it.
+        </p>
+      </aside>
+    </div>
+  </section>
+
+  <!-- -------------------------------------------------------- directory -->
+  <section class="view" id="view-directory">
+    <h1>Directory</h1>
+    <p class="lede">
+      Every business in the tower, who runs it, and which agent works the floor. Offices marked
+      <strong>open</strong> are taking applications.
+    </p>
+    <div class="directory-grid" id="directory-grid"></div>
+  </section>
+
+  <!-- ------------------------------------------------------------ apply -->
+  <section class="view" id="view-apply">
+    <h1>Apply to rent</h1>
+    <p class="lede">
+      The next office in the tower is waiting. Write a short pitch, pick a floor, and the landlord reviews it
+      in the <strong>Landlord</strong> tab. Applications are stored in this browser, so nothing is lost.
+    </p>
+    <div class="two-col">
+      <div>
+        <h2>Open offices</h2>
+        <p class="muted" style="margin-top:-2px">Vacant floors, ready to move into.</p>
+        <table class="list" id="open-floors-table"></table>
+        <p style="margin-top:14px">
+          <button class="btn" id="apply-jump">Go to the tower and pick a floor</button>
+        </p>
+      </div>
+      <div>
+        <h2>How renting works</h2>
+        <div class="card" style="margin-bottom:12px">
+          <div class="k">1 - Visit the office</div>
+          <div class="v">Ride the elevator to an open floor and read the listing.</div>
+        </div>
+        <div class="card" style="margin-bottom:12px">
+          <div class="k">2 - Send a pitch</div>
+          <div class="v">Tell the landlord who you are and what your agent would do on that floor.</div>
+        </div>
+        <div class="card" style="margin-bottom:12px">
+          <div class="k">3 - Landlord reviews</div>
+          <div class="v">Applications appear in the Landlord tab, with the open-floor queue.</div>
+        </div>
+        <div class="card">
+          <div class="k">4 - Move in</div>
+          <div class="v">When approved, your company takes the floor and its agent starts working.</div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- --------------------------------------------------------- landlord -->
+  <section class="view" id="view-landlord">
+    <h1>Landlord</h1>
+    <p class="lede">The queue of open floors and every application that has been sent to the tower.</p>
+    <h2>Open floors</h2>
+    <table class="list" id="open-queue-table">
+      <thead><tr><th>Floor</th><th>Office</th><th>Positioning</th><th>Status</th></tr></thead>
+      <tbody id="open-queue"></tbody>
+    </table>
+    <h2 style="margin-top:26px">Applications</h2>
+    <div id="applications-body"></div>
+  </section>
+</main>
+
+<footer class="site">
+  <span>Tower of AI-run Companies &mdash; a Pollinations quest build (#17999).</span>
+  <span>Agents run on <a href="https://gen.pollinations.ai" target="_blank" rel="noopener noreferrer">gen.pollinations.ai</a>; visitors pay with their own Pollen.</span>
+  <a href="https://pollinations.ai/?ref=badge" target="_blank" rel="noopener noreferrer">Made with pollinations.ai</a>
+  <a href="https://github.com/Sugamdeol/tower-of-ai-companies" target="_blank" rel="noopener noreferrer">Source</a>
+</footer>
+
+<div class="toast" id="toast" role="status" aria-live="polite"></div>
+
+<script src="assets/js/companies.js"></script>
+<script src="assets/js/app.js"></script>
+<script>
+  /* Open-floors table on the Apply tab. */
+  (function () {
+    function render() {
+      var table = document.getElementById("open-floors-table");
+      if (!table) return;
+      var leases = {};
+      try { leases = JSON.parse(localStorage.getItem("tower.leases") || "{}"); } catch (e) {}
+      var rows = (window.COMPANIES || []).filter(function (c) { return c.status === "open" && !leases[c.id]; });
+      var head = document.createElement("thead");
+      var hr = document.createElement("tr");
+      ["Floor", "Office", "Positioning", "Status"].forEach(function (h) {
+        var th = document.createElement("th"); th.textContent = h; hr.appendChild(th);
+      });
+      head.appendChild(hr); table.appendChild(head);
+      var body = document.createElement("tbody");
+      if (!rows.length) {
+        var tr = document.createElement("tr");
+        var td = document.createElement("td"); td.colSpan = 4; td.className = "muted";
+        td.textContent = "Every floor is currently taken.";
+        tr.appendChild(td); body.appendChild(tr);
+      }
+      rows.forEach(function (c) {
+        var tr = document.createElement("tr");
+        [String(c.floor), c.name, c.tagline, "available"].forEach(function (v) {
+          var td = document.createElement("td"); td.textContent = v; tr.appendChild(td);
+        });
+        body.appendChild(tr);
+      });
+      table.appendChild(body);
+    }
+    document.addEventListener("DOMContentLoaded", render);
+    window.addEventListener("hashchange", render);
+    document.addEventListener("click", function (e) {
+      if (e.target && e.target.id === "apply-jump") {
+        var btn = document.querySelector('nav.views button[data-view="tower"]');
+        if (btn) btn.click();
+        setTimeout(render, 100);
+      }
+    });
+  })();
+</script>
+</body>
+</html>
