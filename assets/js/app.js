@@ -361,7 +361,9 @@
     $$(".floor").forEach((node) => {
       const f = Number(node.dataset.floor);
       node.classList.toggle("is-selected", f === floor);
-      node.classList.toggle("is-dim", Math.abs(f - floor) > 1);
+      // Only dim the neighbours while riding; the opening view shows the
+      // whole tower lit.
+      node.classList.toggle("is-dim", !instant && Math.abs(f - floor) > 1);
     });
     $$(".fbtn").forEach((node) => {
       node.classList.toggle("active", Number(node.dataset.floor) === floor);
